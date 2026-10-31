@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kemal & Doğa 💞</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Quicksand:wght@400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fff3f6;
+      --card: #ffffff;
+      --tx: #3d1f2b;
+      --mut: #8a6574;
+      --ac: #e0245e;
+      --ac2: #ff7aa2;
+      --line: #f6d3de;
+      --mine: #ffe1ea;
+      --theirs: #f3ecff;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #1b0f16;
+        --card: #2b1823;
+        --tx: #fde9ef;
+        --mut: #c79bab;
+        --ac: #ff6b9a;
+        --ac2: #ff9dbc;
+        --line: #4a2a3a;
+        --mine: #4a2236;
+        --theirs: #2f2646
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #1b0f16;
+      --card: #2b1823;
+      --tx: #fde9ef;
+      --mut: #c79bab;
+      --ac: #ff6b9a;
+      --ac2: #ff9dbc;
+      --line: #4a2a3a;
+      --mine: #4a2236;
+      --theirs: #2f2646
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--tx);
+      font-family: 'Quicksand', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    h1,
+    h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      margin: 0
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0
+    }
+
+    .hearts span {
+      position: absolute;
+      bottom: -40px;
+      opacity: .35;
+      animation: up linear infinite
+    }
+
+    @keyframes up {
+      to {
+        transform: translateY(-110vh) rotate(25deg);
+        opacity: 0
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .hearts {
+        display: none
+      }
+    }
+
+    main,
+    #login {
+      position: relative;
+      z-index: 1
+    }
+
+    #login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px
+    }
+
+    .box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 32px 26px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(224, 36, 94, .15)
+    }
+
+    .box h1 {
+      font-size: 2rem;
+      color: var(--ac)
+    }
+
+    .box p {
+      color: var(--mut);
+      margin: 8px 0 20px
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 6px 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--tx);
+      font: inherit
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 2px solid var(--ac2)
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 18px;
+      background: linear-gradient(135deg, var(--ac), var(--ac2));
+      color: #fff;
+      font-weight: 600
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--mut);
+      border: 1px solid var(--line)
+    }
+
+    .err {
+      color: var(--ac);
+      min-height: 1.3em;
+      font-size: .9rem
+    }
+
+    .shake {
+      animation: sh .35s
+    }
+
+    @keyframes sh {
+      25% {
+        transform: translateX(-8px)
+      }
+
+      75% {
+        transform: translateX(8px)
+      }
+    }
+
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 22px 16px 60px
+    }
+
+    header {
+      text-align: center;
+      padding: 18px 0
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 7vw, 3.2rem);
+      color: var(--ac)
+    }
+
+    header p {
+      color: var(--mut);
+      margin: 6px 0 14px
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center
+    }
+
+    nav a {
+      color: var(--ac);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: .9rem
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px 18px;
+      margin-top: 20px
+    }
+
+    section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 4px
+    }
+
+    .sub {
+      color: var(--mut);
+      margin: 0 0 14px;
+      font-size: .92rem
+    }
+
+    .units {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px
+    }
+
+    @media(min-width:620px) {
+      .units {
+        grid-template-columns: repeat(6, 1fr)
+      }
+    }
+
+    .u {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 4px;
+      text-align: center
+    }
+
+    .u b {
+      display: block;
+      font-size: 1.8rem;
+      color: var(--ac);
+      font-variant-numeric: tabular-nums
+    }
+
+    .u small {
+      color: var(--mut)
+    }
+
+    .big {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 1.05rem
+    }
+
+    .big b {
+      color: var(--ac);
+      font-size: 1.4rem
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px
+    }
+
+    .chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px dashed var(--line);
+      font-size: .88rem;
+      color: var(--mut)
+    }
+
+    .chip.ok {
+      background: var(--mine);
+      border: 1px solid var(--ac2);
+      color: var(--tx)
+    }
+
+    .msgs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    .msg {
+      max-width: 88%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: var(--theirs);
+      align-self: flex-start;
+      word-wrap: break-word;
+      overflow-wrap: anywhere
+    }
+
+    .msg.mine {
+      background: var(--mine);
+      align-self: flex-end
+    }
+
+    .msg .who {
+      font-size: .78rem;
+      color: var(--mut);
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      margin-top: 4px
+    }
+
+    .msg .who button {
+      padding: 0 4px;
+      background: none;
+      color: var(--mut);
+      font-weight: 400
+    }
+
+    .msg p {
+      margin: 0;
+      white-space: pre-wrap
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .row input {
+      flex: 1;
+      min-width: 160px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    .ph {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid var(--line)
+    }
+
+    .ph img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      cursor: zoom-in
+    }
+
+    .ph div {
+      padding: 6px 8px;
+      font-size: .8rem;
+      color: var(--mut)
+    }
+
+    .ph .x {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 2px 8px;
+      background: rgba(0, 0, 0, .55);
+      border-radius: 99px
+    }
+
+    .wish {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 4px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .wish input {
+      width: auto;
+      margin: 0
+    }
+
+    .wish.done span {
+      text-decoration: line-through;
+      color: var(--mut)
+    }
+
+    .wish span {
+      flex: 1;
+      overflow-wrap: anywhere
+    }
+
+    .wish button {
+      padding: 0 6px;
+      background: none;
+      color: var(--mut);
+      font-weight: 400
+    }
+
+    .empty {
+      color: var(--mut);
+      text-align: center;
+      padding: 14px
+    }
+
+    #mode {
+      text-align: center;
+      font-size: .82rem;
+      color: var(--mut);
+      margin-top: 16px
+    }
+
+    #lb {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9;
+      padding: 16px
+    }
+
+    #lb img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 12px
+    }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      background: var(--tx);
+      color: var(--bg);
+      padding: 10px 16px;
+      border-radius: 12px;
+      display: none;
+      z-index: 10;
+      max-width: 90%;
+      font-size: .9rem
+    }
+
+    footer {
+      text-align: center;
+      color: var(--mut);
+      margin-top: 30px
+    }
+
+    .hide {
+      display: none !important
+    }
+
+    #pfab {
+      position: fixed;
+      right: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      padding: 0;
+      font-size: 1.5rem;
+      z-index: 8;
+      box-shadow: 0 6px 20px rgba(224, 36, 94, .4)
+    }
+
+    #pl {
+      position: fixed;
+      right: 16px;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      width: 330px;
+      max-width: calc(100vw - 32px);
+      max-height: 72vh;
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+      z-index: 8;
+      display: none;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .25)
+    }
+
+    #pl.open {
+      display: block
+    }
+
+    #au {
+      width: 100%;
+      margin-top: 6px
+    }
+
+    .song {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .song span {
+      flex: 1;
+      overflow-wrap: anywhere;
+      font-size: .9rem
+    }
+
+    .song button {
+      padding: 4px 10px
+    }
+
+    .garden {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+      justify-content: center;
+      font-size: 1.7rem;
+      padding: 14px 8px;
+      background: linear-gradient(var(--bg), var(--mine));
+      border-radius: 16px;
+      border: 1px solid var(--line)
+    }
+
+    .garden span {
+      display: inline-block;
+      transform-origin: bottom;
+      animation: sway 3s ease-in-out infinite alternate
+    }
+
+    .garden .bug {
+      animation: wig 2.5s ease-in-out infinite alternate
+    }
+
+    @keyframes sway {
+      from {
+        transform: rotate(-7deg)
+      }
+
+      to {
+        transform: rotate(7deg)
+      }
+    }
+
+    @keyframes wig {
+      from {
+        transform: translate(-8px, 4px)
+      }
+
+      to {
+        transform: translate(10px, -10px)
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .garden span {
+        animation: none
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.js"></script>
+</head>
+
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <div id="login">
+    <div class="box" id="lbox">
+      <h1>Kemal &amp; Doğa</h1>
+      <p>Sadece ikimize özel bir köşe 🌸🦋💕</p>
+      <form id="lf" autocomplete="off">
+        <input id="u" placeholder="Kullanıcı adı (ismin)" autocapitalize="words">
+        <input id="p" type="password" placeholder="Şifre (özel bir tarih 💗)" inputmode="numeric">
+        <div class="err" id="err"></div>
+        <button type="submit" style="width:100%">Giriş yap</button>
+      </form>
+    </div>
+  </div>
+
+  <main id="app" class="hide">
+    <header>
+      <h1>Kemal ♥ Doğa</h1>
+      <p id="hello"></p>
+      <nav>
+        <a href="#sayac">⏳ Sayaç</a><a href="#notlar">💌 Notlar</a><a href="#anilar">📸 Anılar</a><a href="#hayaller">🌙
+          Hayallerimiz</a><a href="#nedenler">💘 Nedenler</a><a href="#bahce">🌷 Bahçemiz</a><a href="#sevgi">🤗
+          Sevgi</a>
+        <a href="#" id="out" style="color:var(--mut)">Çıkış</a>
+      </nav>
+    </header>
+
+    <section id="sayac">
+      <h2>Birlikte geçen zaman</h2>
+      <p class="sub">29 Ekim 2025’ten beri, her saniye seninle daha güzel.</p>
+      <div class="units" id="units"></div>
+      <div class="big" id="big"></div>
+      <div class="chips" id="chips"></div>
+    </section>
+
+    <section id="bahce">
+      <h2>Aşk bahçemiz 🌷</h2>
+      <p class="sub">Birlikte geçen her hafta bahçemizde yeni bir çiçek açıyor 🌱</p>
+      <div class="garden" id="garden"></div>
+      <div class="big" id="daily"></div>
+    </section>
+
+    <section id="sevgi">
+      <h2>Sevgi kumbarası 🐝</h2>
+      <p class="sub">Uzakta da olsak birbirimize minik jestler gönderelim; ikimiz de görürüz 💞</p>
+      <div class="row" style="justify-content:center"><button id="k-hug">🤗 Sarıl</button><button id="k-kiss">😘
+          Öp</button><button id="k-flower">🌹 Çiçek ver</button></div>
+      <div class="big" id="kstat"></div>
+    </section>
+
+    <section id="notlar">
+      <h2>Birbirimize notlar</h2>
+      <p class="sub">Yaz, gönder; diğerimiz açınca okusun.</p>
+      <textarea id="nt" rows="3" maxlength="800" placeholder="Bir şeyler yaz…"></textarea>
+      <button id="nsend">Notu bırak 💌</button>
+      <div class="msgs" id="msgs"></div>
+    </section>
+
+    <section id="anilar">
+      <h2>Anılarımız</h2>
+      <p class="sub">Küçük bir başlık yaz, fotoğraf seç; albüme eklensin.</p>
+      <div class="row">
+        <input id="cap" maxlength="60" placeholder="Fotoğraf başlığı (isteğe bağlı)">
+        <button id="pbtn">📷 Fotoğraf ekle</button>
+        <input type="file" id="pf" accept="image/*" class="hide">
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section id="hayaller">
+      <h2>Birlikte yapacaklarımız</h2>
+      <p class="sub">Hayal et, listeye ekle; gerçekleşince işaretle ✨</p>
+      <div class="row">
+        <input id="wi" maxlength="100" placeholder="Örn. Birlikte deniz kenarında gün batımı izlemek">
+        <button id="wadd">Ekle</button>
+      </div>
+      <div id="wishes"></div>
+    </section>
+
+    <section id="nedenler">
+      <h2>Seni neden seviyorum</h2>
+      <p class="sub">İkimiz de yazalım; canın sıkıldığında rastgele birini aç 💘</p>
+      <div class="row">
+        <input id="ri" maxlength="140" placeholder="Çünkü…">
+        <button id="radd">Ekle</button>
+      </div>
+      <div class="big" id="rpick" style="min-height:1.5em"></div>
+      <div style="text-align:center;margin-top:8px"><button class="ghost" id="rrand">🎲 Rastgele bir neden</button>
+      </div>
+      <div id="rlist"></div>
+    </section>
+
+    <button id="pfab" aria-label="Müzik">🎵</button>
+    <div id="pl">
+      <b>🎶 Şarkılarımız</b>
+      <div id="np" class="sub" style="margin:4px 0 0">Çalan: —</div>
+      <iframe id="yt" allow="autoplay; encrypted-media" allowfullscreen
+        style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px;margin-top:6px;display:none"></iframe>
+      <div class="row" style="margin-top:10px">
+        <input id="sq" placeholder="Şarkı ara…">
+      </div>
+      <div class="row">
+        <button id="syt">🔎 Ara</button>
+      </div>
+      <div id="sres"></div>
+      <p class="sub" style="margin:10px 0 4px">Listemiz (➕ ile eklenir):</p>
+      <div id="slist"></div>
+    </div>
+
+    <div id="mode"></div>
+    <footer>Doğa ve Kemal · 29.10.2025’ten beri 💞</footer>
+  </main>
+
+  <div id="lb"><img alt=""></div>
+  <div id="toast"></div>
+
+  <script>
+    /* ===== AYARLAR: Supabase panelinden kopyala ===== */
+    const SB_URL = 'https://ltaiyrynypdgtfhuvghy.supabase.co';
+    const SB_KEY = 'sb_publishable_ljRgULGCLuCicM9fZExuKQ_h-TdgGck';
+    const YT_KEY = '';  /* isteğe bağlı: YouTube Data API anahtarı */
+    const MAILS = { Kemal: 'kemal@kemalvedoga.com', Doğa: 'doga@kemalvedoga.com' };
+    /* ================================================= */
+    const START = new Date(2025, 9, 29, 0, 0, 0);
+    const $ = s => document.querySelector(s);
+    const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e };
+    const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v) } catch (e) { return null } };
+    let me = null, db = null, cols = { notes: [], photos: [], wishes: [], reasons: [], songs: [], hugs: [] }, timer = null;
+
+    /* arka plan kalpleri */
+    (function () { const h = $('#hearts');['💗', '🌸', '🦋', '🌷', '🐞', '🐝', '🌼', '💕'].forEach((c, i) => { for (let k = 0; k < 3; k++) { const s = el('span', '', c); s.style.left = Math.random() * 95 + '%'; s.style.fontSize = (14 + Math.random() * 18) + 'px'; s.style.animationDuration = (12 + Math.random() * 14) + 's'; s.style.animationDelay = (-Math.random() * 20) + 's'; h.appendChild(s) } }) })();
+
+    function toast(t) { const e = $('#toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = 'none', 3500) }
+    const norm = s => s.trim().toLocaleLowerCase('tr').replace(/ğ/g, 'g').replace(/ı/g, 'i');
+
+    /* giriş */
+    function who(u) { const n = norm(u); return n === 'kemal' ? 'Kemal' : n === 'doga' ? 'Doğa' : null }
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+    $('#lf').addEventListener('submit', async e => {
+      e.preventDefault(); const w = who($('#u').value);
+      const bad = () => { $('#err').textContent = 'Kullanıcı adı ya da şifre hatalı 🙈'; const x = $('#lbox'); x.classList.remove('shake'); void x.offsetWidth; x.classList.add('shake') };
+      if (!w) return bad();
+      const { error } = await sb.auth.signInWithPassword({ email: MAILS[w], password: $('#p').value.trim() });
+      error ? bad() : enter(w)
+    });
+    $('#out').addEventListener('click', async e => { e.preventDefault(); await sb.auth.signOut(); location.reload() });
+    sb.auth.getSession().then(({ data }) => { const m = data.session && data.session.user.email; const w = Object.keys(MAILS).find(k => MAILS[k] === m); if (w) enter(w) });
+
+    async function enter(w) {
+      me = w; $('#login').classList.add('hide'); $('#app').classList.remove('hide');
+      $('#hello').textContent = w === 'Kemal' ? 'Hoş geldin Kemal 💙' : 'Hoş geldin Doğa 💗';
+      buildUnits(); tick(); timer = setInterval(tick, 1000);
+      const ALL = ['notes', 'photos', 'wishes', 'reasons', 'songs', 'hugs']; ALL.forEach(load); sb.channel('all').on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => ALL.forEach(load)).subscribe();
+      $('#mode').textContent = '💞 Sadece Kemal ve Doğa giriş yapabilir; her şey ortak ve güvenle saklanıyor.';
+    }
+
+    /* sayaç */
+    const UN = [['y', 'yıl'], ['mo', 'ay'], ['d', 'gün'], ['h', 'saat'], ['mi', 'dakika'], ['s', 'saniye']];
+    function buildUnits() { const c = $('#units'); c.innerHTML = ''; UN.forEach(([k, l]) => { const u = el('div', 'u'); const b = el('b', '', '0'); b.id = 'u-' + k; u.append(b, el('small', '', l)); c.appendChild(u) }) }
+    function tick() {
+      const n = new Date(); let mo = (n.getFullYear() - 2025) * 12 + n.getMonth() - 9; let a = new Date(2025, 9 + mo, 29);
+      if (a > n) { mo--; a = new Date(2025, 9 + mo, 29) }
+      let ms = n - a; const d = Math.floor(ms / 864e5); ms -= d * 864e5; const h = Math.floor(ms / 36e5); ms -= h * 36e5;
+      const v = { y: Math.floor(mo / 12), mo: mo % 12, d, h, mi: Math.floor(ms / 6e4), s: Math.floor(ms % 6e4 / 1e3) };
+      for (const k in v) $('#u-' + k).textContent = v[k];
+      const tot = Math.floor((n - START) / 864e5);
+      const ny = new Date(2025 + v.y + 1, 9, 29), left = Math.ceil((ny - n) / 864e5);
+      const big = $('#big'); big.textContent = '';
+      big.append('Toplam ', Object.assign(el('b', '', String(tot)), {}), ' gündür birlikteyiz · ', (v.mo === 0 && v.d <= 2 && v.y > 0) ? 'Yıl dönümümüz kutlu olsun! 🎉' : 'Bir sonraki yıl dönümüne ' + left + ' gün');
+      const ch = $('#chips'); if (ch.dataset.t !== String(tot)) {
+        ch.dataset.t = tot; ch.innerHTML = '';
+        [100, 200, 300, 365, 500, 730, 1000, 1500].forEach(m => {
+          const dt = new Date(START.getTime()); dt.setDate(dt.getDate() + m);
+          const ok = tot >= m; ch.appendChild(el('span', 'chip' + (ok ? ' ok' : ''), (ok ? '✓ ' : '') + m + '. gün · ' + dt.toLocaleDateString('tr-TR')))
+        })
+      }
+    }
+
+    /* veri katmanı: Supabase */
+    const rows = r => r.map(x => Object.assign({ id: x.id, by: x.by, t: x.t }, x.data));
+    async function load(n) { const { data, error } = await sb.from('items').select('*').eq('kind', n).order('t', { ascending: false }); if (error) { toast('Veri okunamadı: ' + error.message); return } cols[n] = rows(data); draw(n) }
+    async function put(n, o) { const { error } = await sb.from('items').insert({ kind: n, by: me, t: Date.now(), data: o }); if (error) { toast('Kaydedilemedi: ' + error.message); return false } load(n); return true }
+    async function del(n, id) { const { error } = await sb.from('items').delete().eq('id', id); if (error) toast('Silinemedi'); load(n) }
+    async function upd(n, id, o) { const c = Object.assign({}, cols[n].find(x => x.id === id) || {}, o); delete c.id; delete c.by; delete c.t; const { error } = await sb.from('items').update({ data: c }).eq('id', id); if (error) toast('Güncellenemedi'); load(n) }
+    function draw(n) { ({ notes: dNotes, photos: dPhotos, wishes: dWishes, reasons: dReasons, songs: dSongs, hugs: dHugs })[n]() }
+    const fmt = t => new Date(t).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+    /* notlar */
+    function dNotes() {
+      const c = $('#msgs'); c.innerHTML = '';
+      if (!cols.notes.length) { c.appendChild(el('div', 'empty', 'Henüz not yok. İlk notu sen bırak 🥰')); return }
+      cols.notes.forEach(x => {
+        const m = el('div', 'msg' + (x.by === me ? ' mine' : '')); m.appendChild(el('p', '', x.text));
+        const w = el('div', 'who'); w.appendChild(el('span', '', (x.by === 'Doğa' ? '💗 ' : '💙 ') + x.by + ' · ' + fmt(x.t)));
+        if (x.by === me) { const b = el('button', '', 'sil'); b.onclick = () => del('notes', x.id); w.appendChild(b) }
+        m.appendChild(w); c.appendChild(m)
+      })
+    }
+    $('#nsend').onclick = async () => { const v = $('#nt').value.trim(); if (!v) return; if (await put('notes', { text: v })) $('#nt').value = '' };
+
+    /* fotoğraflar */
+    function dPhotos() {
+      const g = $('#grid'); g.innerHTML = '';
+      if (!cols.photos.length) { g.appendChild(el('div', 'empty', 'İlk anıyı ekleyelim 📸')); return }
+      cols.photos.forEach(x => {
+        const p = el('div', 'ph'); const i = el('img'); i.src = x.img; i.alt = x.cap || 'Anı'; i.onclick = () => { $('#lb img').src = x.img; $('#lb').style.display = 'flex' }; p.appendChild(i);
+        p.appendChild(el('div', '', (x.cap ? x.cap + ' · ' : '') + x.by + ' · ' + new Date(x.t).toLocaleDateString('tr-TR')));
+        if (x.by === me) { const b = el('button', 'x', '✕'); b.onclick = () => { if (confirm('Bu fotoğraf silinsin mi?')) del('photos', x.id) }; p.appendChild(b) }
+        g.appendChild(p)
+      })
+    }
+    $('#lb').onclick = () => $('#lb').style.display = 'none';
+    $('#pbtn').onclick = () => $('#pf').click();
+    function shrink(f) {
+      return new Promise((ok, no) => {
+        const i = new Image(), u = URL.createObjectURL(f);
+        i.onload = () => {
+          const r = Math.min(1, 800 / Math.max(i.width, i.height)), c = document.createElement('canvas'); c.width = Math.round(i.width * r); c.height = Math.round(i.height * r);
+          c.getContext('2d').drawImage(i, 0, 0, c.width, c.height); URL.revokeObjectURL(u); let q = .72, d = c.toDataURL('image/jpeg', q);
+          while (d.length > 170000 && q > .3) { q -= .1; d = c.toDataURL('image/jpeg', q) } ok(d)
+        };
+        i.onerror = no; i.src = u
+      })
+    }
+    $('#pf').onchange = async e => {
+      const f = e.target.files[0]; if (!f) return;
+      try { const img = await shrink(f); if (await put('photos', { img, cap: $('#cap').value.trim() })) { $('#cap').value = ''; toast('Anı eklendi 💞') } } catch (x) { toast('Fotoğraf okunamadı.') }
+      e.target.value = ''
+    };
+
+    /* hayaller */
+    function dWishes() {
+      const c = $('#wishes'); c.innerHTML = '';
+      if (!cols.wishes.length) { c.appendChild(el('div', 'empty', 'Birlikte neler yapmak istersin? 🌙')); return }
+      [...cols.wishes].sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0)).forEach(x => {
+        const r = el('div', 'wish' + (x.done ? ' done' : ''));
+        const k = el('input'); k.type = 'checkbox'; k.checked = !!x.done; k.onchange = () => upd('wishes', x.id, { done: k.checked });
+        const s = el('span', '', x.text); const d = el('button', '', '✕'); d.onclick = () => del('wishes', x.id); r.append(k, s, d); c.appendChild(r)
+      })
+    }
+    const addW = async () => { const v = $('#wi').value.trim(); if (v && await put('wishes', { text: v, done: false })) $('#wi').value = '' };
+    $('#wadd').onclick = addW; $('#wi').addEventListener('keydown', e => { if (e.key === 'Enter') addW() });
+
+    /* nedenler */
+    function dReasons() {
+      const c = $('#rlist'); c.innerHTML = '';
+      if (!cols.reasons.length) { c.appendChild(el('div', 'empty', 'Yazmaya başla 💘')); return }
+      cols.reasons.forEach(x => {
+        const r = el('div', 'wish'); r.appendChild(el('span', '', (x.by === 'Doğa' ? '💗 ' : '💙 ') + x.text + ' — ' + x.by));
+        if (x.by === me) { const d = el('button', '', '✕'); d.onclick = () => del('reasons', x.id); r.appendChild(d) } c.appendChild(r)
+      })
+    }
+    const addR = async () => { const v = $('#ri').value.trim(); if (v && await put('reasons', { text: v })) $('#ri').value = '' };
+    $('#radd').onclick = addR; $('#ri').addEventListener('keydown', e => { if (e.key === 'Enter') addR() });
+    $('#rrand').onclick = () => { if (!cols.reasons.length) { toast('Önce bir neden ekle 🥰'); return } const x = cols.reasons[Math.floor(Math.random() * cols.reasons.length)]; $('#rpick').textContent = '“' + x.text + '” — ' + x.by };
+
+    /* bahçe ve günlük mesaj */
+    const FL = ['🌸', '🌷', '🌻', '🌼', '🌹', '🪻', '🌺'], BG = ['🦋', '🐞', '🐝', '🐛'];
+    const DM = ['Bugünün hatırlatması: seninle aynı hikâyede olmak dünyanın en güzel işi 🌷', 'Gülüşün bahçedeki bütün çiçeklerden daha güzel 🌸', 'Bugün kendine iyi bak, çünkü sen benim en sevdiğim insansın 💗', 'Bir kelebek kanat çırpsa bile aklıma sen gelirsin 🦋', 'Seninle her gün küçük bir bayram 🎈', 'Bugün yüzünde bir gülümseme olsun, sebebi benim 🐝', 'Sen varsın diye sıradan günler bile tatlı 🍯', 'Bugünün şarkısı: kalbimin sesi, sana doğru 🎶', 'Bir kucak dolusu sevgi gönderdim, kapıyı çal 🤍', 'Sen benim en güzel tesadüfümsün 🌼', 'Bugün de şanslı sayıyorum kendimi, çünkü sen varsın 🍀', 'Dünyanın en tatlı uğur böceği sensin 🐞', 'Yanımda olmasan da kalbim hep yanında 💞', 'Seninle büyüyen bir bahçeyiz biz 🌱'];
+    function garden() {
+      const c = $('#garden'); if (!c) return; const tot = Math.floor((new Date() - START) / 864e5), n = Math.max(1, Math.floor(tot / 7) + 1);
+      if (c.dataset.n !== String(n)) {
+        c.dataset.n = n; c.innerHTML = ''; for (let i = 0; i < n; i++) { const s = el('span', '', FL[i % FL.length]); s.style.animationDelay = (-(i % 7) * .4) + 's'; c.appendChild(s) }
+        BG.forEach((b, i) => { const s = el('span', 'bug', b); s.style.animationDelay = (-i * .6) + 's'; c.appendChild(s) })
+      }
+      $('#daily').textContent = DM[tot % DM.length]
+    }
+    garden(); setInterval(garden, 6e4);
+
+    /* sevgi kumbarası */
+    const KI = { hug: ['🤗', 'sarıldı'], kiss: ['😘', 'öptü'], flower: ['🌹', 'çiçek verdi'] };
+    function dHugs() {
+      const c = { hug: 0, kiss: 0, flower: 0 }; cols.hugs.forEach(x => { if (c[x.k] != null) c[x.k]++ }); const l = cols.hugs[0];
+      $('#kstat').textContent = '🤗 ' + c.hug + ' · 😘 ' + c.kiss + ' · 🌹 ' + c.flower + (l && KI[l.k] ? ' — Son: ' + l.by + ' ' + KI[l.k][1] + ' (' + fmt(l.t) + ')' : '')
+    }
+    Object.keys(KI).forEach(k => { $('#k-' + k).onclick = async () => { if (await put('hugs', { k })) toast(KI[k][0] + ' gönderildi!') } });
+
+    /* müzik çalar */
+    $('#pfab').onclick = () => $('#pl').classList.toggle('open');
+    const sq = () => encodeURIComponent($('#sq').value.trim());
+    const go = u => window.open(u, '_blank', 'noopener');
+    function dSongs() {
+      const c = $('#slist'); c.innerHTML = '';
+      if (!cols.songs.length) { c.appendChild(el('div', 'empty', 'Henüz şarkı yok 🎧')); return }
+      cols.songs.forEach(x => {
+        const r = el('div', 'song'); const p = el('button', '', '▶');
+        p.onclick = () => play(x.vid, x.title);
+        r.append(p, el('span', '', '🎵 ' + x.title));
+        if (x.by === me) { const d = el('button', 'ghost', '✕'); d.onclick = () => del('songs', x.id); r.appendChild(d) } c.appendChild(r)
+      })
+    }
+    function play(id, t) { const f = $('#yt'); f.style.display = 'block'; f.src = 'https://www.youtube.com/embed/' + id + '?autoplay=1'; $('#np').textContent = 'Çalan: ' + t }
+    const dec = t => { const d = document.createElement('textarea'); d.innerHTML = t; return d.value };
+    async function ysearch() {
+      if (!$('#sq').value.trim()) { toast('Önce şarkı adını yaz'); return }
+      if (!YT_KEY) { go('https://www.youtube.com/results?search_query=' + sq()); return }
+      try {
+        const r = await fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=6&q=' + sq() + '&key=' + YT_KEY); const j = await r.json(); if (!j.items) throw 0;
+        const c = $('#sres'); c.innerHTML = '';
+        j.items.forEach(v => {
+          const t = dec(v.snippet.title), id = v.id.videoId, row = el('div', 'song'), p = el('button', '', '▶'), a = el('button', 'ghost', '➕');
+          p.onclick = () => play(id, t); a.onclick = async () => { if (await put('songs', { title: t, vid: id })) toast('Listeye eklendi 🎶') };
+          row.append(p, el('span', '', t), a); c.appendChild(row)
+        })
+      } catch (e) { toast('Arama yapılamadı; YouTube anahtarını kontrol et') }
+    }
+    $('#syt').onclick = ysearch; $('#sq').addEventListener('keydown', e => { if (e.key === 'Enter') ysearch() });
+  </script>
+</body>
+
+</html>
