@@ -752,7 +752,7 @@
       $('#hello').textContent = w === 'Kemal' ? 'Hoş geldin Kemal 💙' : 'Hoş geldin Doğa 💗';
       buildUnits(); tick(); timer = setInterval(tick, 1000);
       const ALL = ['notes', 'photos', 'wishes', 'reasons', 'songs', 'hugs']; ALL.forEach(load); sb.channel('all').on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => ALL.forEach(load)).subscribe();
-      $('#mode').textContent = '💞 Sadece Kemal ve Doğa giriş yapabilir; her şey ortak ve güvenle saklanıyor.';
+      $('#mode').textContent = '💞 Seni çok seviyorum.';
     }
 
     /* sayaç */
