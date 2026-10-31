@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sayılarla Boyama 🎨</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff3f6;--card:#fff;--tx:#3d1f2b;--mut:#8a6574;--ac:#e0245e;--ac2:#ff7aa2;--line:#f6d3de;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#1b0f16;--card:#2b1823;--tx:#fde9ef;--mut:#c79bab;--ac:#ff6b9a;--ac2:#ff9dbc;--line:#4a2a3a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:'Quicksand',system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:18px 14px 50px}
+h1{font-family:'Playfair Display',Georgia,serif;color:var(--ac);margin:6px 0;font-size:clamp(1.7rem,6vw,2.5rem);text-align:center}
+.sub{color:var(--mut);text-align:center;margin:0 0 14px}
+a.back{color:var(--ac);font-weight:600;text-decoration:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row label{font-size:.9rem;color:var(--mut)}
+button,select{font:inherit;border-radius:12px;border:0;padding:10px 14px;cursor:pointer}
+button{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-weight:600}
+button.g{background:transparent;color:var(--mut);border:1px solid var(--line)}
+button.on{outline:2px solid var(--ac)}
+select{background:var(--bg);color:var(--tx);border:1px solid var(--line)}
+input[type=range]{accent-color:var(--ac)}
+#pal{display:flex;flex-wrap:wrap;gap:8px}
+.chip{width:52px;padding:6px 0 4px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--tx);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chip i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.95rem;border:1px solid rgba(0,0,0,.2)}
+.chip small{font-size:.7rem;color:var(--mut);font-weight:400}
+.chip.sel{border-color:var(--ac);box-shadow:0 0 0 2px var(--ac2)}
+.chip.done{opacity:.45}
+#wrap{overflow:auto;max-height:78vh;border:1px solid var(--line);border-radius:14px;background:#fff;margin-top:12px;-webkit-overflow-scrolling:touch}
+canvas{display:block;touch-action:manipulation;cursor:crosshair}
+#bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:10px}
+#bar div{height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;display:none;z-index:9;max-width:90%;font-size:.9rem}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← Kemal &amp; Doğa</a>
+  <h1>Sayılarla Boyama 🎨</h1>
+  <p class="sub">Bir resim seç; renklere ayrılıp numaralansın. Numarayı seç, aynı numaralı bölgelere dokun, boya!</p>
+
+  <div class="card">
+    <div class="row">
+      <button id="pick">🖼 Resim seç</button>
+      <button class="g" id="demo">🌸 Örnek resim</button>
+      <input type="file" id="file" accept="image/*" class="hide">
+    </div>
+    <div class="row" style="margin-top:12px">
+      <label>Detay <select id="det"><option value="100">Kolay</option><option value="150" selected>Orta</option><option value="220">Detaylı</option></select></label>
+      <label>Renk sayısı: <b id="kv">12</b> <input type="range" id="k" min="5" max="24" value="12"></label>
+      <button class="g" id="regen">Yeniden oluştur</button>
+    </div>
+  </div>
+
+  <div id="work" class="hide">
+    <div class="card">
+      <div id="pal"></div>
+      <div id="bar"><div></div></div>
+      <div class="row" style="margin-top:12px">
+        <button class="g" id="hint">💡 İpucu</button>
+        <button class="g" id="prev">👁 Sonuç</button>
+        <button class="g" id="reset">↺ Sıfırla</button>
+        <button class="g" id="dl">⬇ PNG indir</button>
+        <label>Yakınlaştır <input type="range" id="zoom" min="1" max="4" step="0.1" value="1"></label>
+      </div>
+      <div id="wrap"><canvas id="cv"></canvas></div>
+    </div>
+  </div>
+</main>
+<div id="toast"></div>
+
+<script id="core">
+/* ---- saf algoritma: renklere ayır, bölgeleri bul ---- */
+function km(px,N,K){
+  const cen=new Float32Array(K*3),D=new Float32Array(N).fill(1e12);let p=Math.floor(Math.random()*N);
+  for(let k=0;k<K;k++){
+    cen[k*3]=px[p*3];cen[k*3+1]=px[p*3+1];cen[k*3+2]=px[p*3+2];let sum=0;
+    for(let i=0;i<N;i++){const a=px[i*3]-cen[k*3],b=px[i*3+1]-cen[k*3+1],c=px[i*3+2]-cen[k*3+2],dd=a*a+b*b+c*c;if(dd<D[i])D[i]=dd;sum+=D[i]}
+    let r=Math.random()*sum;p=N-1;for(let i=0;i<N;i++){r-=D[i];if(r<=0){p=i;break}}
+  }
+  const lab=new Uint8Array(N);
+  for(let it=0;it<10;it++){
+    for(let i=0;i<N;i++){let best=0,bd=1e12;for(let k=0;k<K;k++){const a=px[i*3]-cen[k*3],b=px[i*3+1]-cen[k*3+1],c=px[i*3+2]-cen[k*3+2],dd=a*a+b*b+c*c;if(dd<bd){bd=dd;best=k}}lab[i]=best}
+    const s=new Float64Array(K*3),n=new Int32Array(K);
+    for(let i=0;i<N;i++){const k=lab[i];s[k*3]+=px[i*3];s[k*3+1]+=px[i*3+1];s[k*3+2]+=px[i*3+2];n[k]++}
+    for(let k=0;k<K;k++)if(n[k]){cen[k*3]=s[k*3]/n[k];cen[k*3+1]=s[k*3+1]/n[k];cen[k*3+2]=s[k*3+2]/n[k]}
+  }
+  return {lab,cen};
+}
+function mode(lab,W,H,K){
+  const o=new Uint8Array(lab.length),cnt=new Uint8Array(K);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    cnt.fill(0);
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy;if(xx>=0&&yy>=0&&xx<W&&yy<H)cnt[lab[yy*W+xx]]++}
+    let b=lab[y*W+x];for(let k=0;k<K;k++)if(cnt[k]>cnt[b])b=k;o[y*W+x]=b;
+  }
+  return o;
+}
+function comps(lab,W,H){
+  const N=W*H,rid=new Int32Array(N).fill(-1),sizes=[],st=[];let n=0;
+  for(let s=0;s<N;s++){
+    if(rid[s]>=0)continue;rid[s]=n;st.push(s);let sz=0;const L=lab[s];
+    while(st.length){
+      const p=st.pop();sz++;const x=p%W,y=(p/W)|0;
+      if(x>0&&rid[p-1]<0&&lab[p-1]===L){rid[p-1]=n;st.push(p-1)}
+      if(x<W-1&&rid[p+1]<0&&lab[p+1]===L){rid[p+1]=n;st.push(p+1)}
+      if(y>0&&rid[p-W]<0&&lab[p-W]===L){rid[p-W]=n;st.push(p-W)}
+      if(y<H-1&&rid[p+W]<0&&lab[p+W]===L){rid[p+W]=n;st.push(p+W)}
+    }
+    sizes.push(sz);n++;
+  }
+  return {rid,sizes,n};
+}
+function merge(lab,W,H,MIN){
+  const N=W*H;
+  for(let pass=0;pass<6;pass++){
+    const c=comps(lab,W,H),rid=c.rid;if(c.n===1)break;
+    const idx=new Int32Array(c.n).fill(-1),cnt=[];
+    for(let r=0;r<c.n;r++)if(c.sizes[r]<MIN){idx[r]=cnt.length;cnt.push(new Map())}
+    if(!cnt.length)break;
+    const add=(si,q)=>{const m=cnt[si];m.set(lab[q],(m.get(lab[q])||0)+1)};
+    for(let p=0;p<N;p++){
+      const si=idx[rid[p]];if(si<0)continue;const x=p%W,y=(p/W)|0,r=rid[p];
+      if(x>0&&rid[p-1]!==r)add(si,p-1);if(x<W-1&&rid[p+1]!==r)add(si,p+1);
+      if(y>0&&rid[p-W]!==r)add(si,p-W);if(y<H-1&&rid[p+W]!==r)add(si,p+W);
+    }
+    const nl=cnt.map(m=>{let b=-1,bc=0;m.forEach((v,k)=>{if(v>bc){bc=v;b=k}});return b});
+    for(let p=0;p<N;p++){const si=idx[rid[p]];if(si>=0&&nl[si]>=0)lab[p]=nl[si]}
+  }
+}
+function analyze(d,W,H,K){
+  const N=W*H,px=new Float32Array(N*3);
+  for(let i=0;i<N;i++){px[i*3]=d[i*4];px[i*3+1]=d[i*4+1];px[i*3+2]=d[i*4+2]}
+  const r=km(px,N,K),lab=mode(r.lab,W,H,K);
+  merge(lab,W,H,Math.max(8,Math.round(N/1100)));
+  const c=comps(lab,W,H),rid=c.rid,n=c.n,dist=new Uint16Array(N);
+  for(let p=0;p<N;p++){const x=p%W,y=(p/W)|0;
+    dist[p]=(x===0||y===0||x===W-1||y===H-1||rid[p-1]!==rid[p]||rid[p+1]!==rid[p]||rid[p-W]!==rid[p]||rid[p+W]!==rid[p])?0:9999}
+  for(let p=0;p<N;p++){const x=p%W;if(x>0&&dist[p-1]+1<dist[p])dist[p]=dist[p-1]+1;if(p>=W&&dist[p-W]+1<dist[p])dist[p]=dist[p-W]+1}
+  for(let p=N-1;p>=0;p--){const x=p%W;if(x<W-1&&dist[p+1]+1<dist[p])dist[p]=dist[p+1]+1;if(p+W<N&&dist[p+W]+1<dist[p])dist[p]=dist[p+W]+1}
+  const best=new Int32Array(n).fill(-1),cnt=new Int32Array(K);
+  for(let p=0;p<N;p++){const q=rid[p];if(best[q]<0||dist[p]>dist[best[q]])best[q]=p;cnt[lab[p]]++}
+  const used=[...Array(K).keys()].filter(k=>cnt[k]).sort((a,b)=>cnt[b]-cnt[a]),map=new Int16Array(K).fill(-1);
+  used.forEach((k,i)=>map[k]=i);
+  const pal=used.map(k=>[Math.round(r.cen[k*3]),Math.round(r.cen[k*3+1]),Math.round(r.cen[k*3+2])]);
+  const regs=[];for(let i=0;i<n;i++){const p=best[i];regs.push({l:map[lab[p]],cx:p%W,cy:(p/W)|0,r:dist[p]+1})}
+  const L=new Uint8Array(N);for(let p=0;p<N;p++)L[p]=map[lab[p]];
+  return {rid,L,pal,regs,W,H};
+}
+</script>
+
+<script>
+const $=s=>document.querySelector(s);
+let G=null,src=null;
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
+const rgb=c=>'rgb('+c[0]+','+c[1]+','+c[2]+')';
+const dark=c=>(c[0]*.299+c[1]*.587+c[2]*.114)>150?'#222':'#fff';
+
+function sample(){
+  const c=document.createElement('canvas');c.width=400;c.height=300;const x=c.getContext('2d');
+  x.fillStyle='#bfe6ff';x.fillRect(0,0,400,300);x.fillStyle='#7fcf6a';x.fillRect(0,220,400,80);
+  x.fillStyle='#ffd23f';x.beginPath();x.arc(330,60,38,0,7);x.fill();
+  x.strokeStyle='#2e8b3e';x.lineWidth=8;x.beginPath();x.moveTo(150,235);x.lineTo(150,130);x.stroke();
+  x.fillStyle='#ff7aa2';for(let i=0;i<6;i++){const a=i*Math.PI/3;x.beginPath();x.arc(150+Math.cos(a)*34,110+Math.sin(a)*34,24,0,7);x.fill()}
+  x.fillStyle='#ffd23f';x.beginPath();x.arc(150,110,20,0,7);x.fill();
+  x.fillStyle='#e0245e';x.beginPath();x.moveTo(300,245);x.bezierCurveTo(255,215,270,180,300,200);x.bezierCurveTo(330,180,345,215,300,245);x.fill();
+  return c;
+}
+function go(){
+  if(!src)return;toast('Hazırlanıyor…');
+  setTimeout(()=>{
+    const dim=+$('#det').value,K=+$('#k').value,sw=src.naturalWidth||src.width,sh=src.naturalHeight||src.height,sc=dim/Math.max(sw,sh);
+    const W=Math.max(8,Math.round(sw*sc)),H=Math.max(8,Math.round(sh*sc));
+    const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+    x.fillStyle='#fff';x.fillRect(0,0,W,H);x.imageSmoothingQuality='high';x.drawImage(src,0,0,W,H);
+    const a=analyze(x.getImageData(0,0,W,H).data,W,H,K),S=Math.max(4,Math.floor(1000/Math.max(W,H)));
+    const lc=document.createElement('canvas');lc.width=W*S;lc.height=H*S;const lx=lc.getContext('2d');lx.fillStyle='#555';
+    for(let y=0;y<H;y++)for(let xx=0;xx<W;xx++){const p=y*W+xx;
+      if(xx<W-1&&a.rid[p]!==a.rid[p+1])lx.fillRect((xx+1)*S-1,y*S,2,S+1);
+      if(y<H-1&&a.rid[p]!==a.rid[p+W])lx.fillRect(xx*S,(y+1)*S-1,S+1,2)}
+    lx.strokeStyle='#555';lx.lineWidth=2;lx.strokeRect(1,1,W*S-2,H*S-2);
+    const fc=document.createElement('canvas');fc.width=W;fc.height=H;
+    G=Object.assign(a,{S,lc,fc,filled:new Uint8Array(a.regs.length),sel:0,hint:false,preview:false});
+    const cv=$('#cv');cv.width=W*S;cv.height=H*S;
+    $('#work').classList.remove('hide');$('#hint').classList.remove('on');$('#prev').classList.remove('on');
+    setZoom();pal();draw();toast(a.regs.length+' bölge, '+a.pal.length+' renk 🎨');
+  },30);
+}
+function pal(){
+  const rem=new Int32Array(G.pal.length);G.regs.forEach((r,i)=>{if(!G.filled[i])rem[r.l]++});
+  const box=$('#pal');box.innerHTML='';
+  G.pal.forEach((c,i)=>{
+    const b=document.createElement('button');b.className='chip'+(G.sel===i?' sel':'')+(rem[i]?'':' done');
+    const sw=document.createElement('i');sw.style.background=rgb(c);sw.style.color=dark(c);sw.textContent=i+1;
+    const s=document.createElement('small');s.textContent=rem[i]?rem[i]+' kaldı':'✓';
+    b.append(sw,s);b.onclick=()=>{G.sel=i;pal();draw()};box.appendChild(b)});
+  const done=G.regs.filter((r,i)=>G.filled[i]).length;
+  $('#bar div').style.width=(100*done/G.regs.length)+'%';
+}
+function draw(){
+  const {W,H,S,rid,L,regs,pal:P,filled,fc}=G,fx=fc.getContext('2d'),im=fx.createImageData(W,H),o=im.data;
+  for(let p=0;p<W*H;p++){
+    let c=[255,255,255];const l=L[p];
+    if(G.preview||filled[rid[p]])c=P[l];
+    else if(G.hint&&l===G.sel){const q=P[l];c=[q[0]*.4+153,q[1]*.4+153,q[2]*.4+153]}
+    o[p*4]=c[0];o[p*4+1]=c[1];o[p*4+2]=c[2];o[p*4+3]=255;
+  }
+  fx.putImageData(im,0,0);
+  const cx=$('#cv').getContext('2d');cx.imageSmoothingEnabled=false;
+  cx.drawImage(fc,0,0,W*S,H*S);cx.drawImage(G.lc,0,0);
+  if(!G.preview){
+    cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#333';
+    regs.forEach((r,i)=>{if(filled[i])return;const fs=Math.max(9,Math.min(24,r.r*S*1.1));
+      cx.font='600 '+fs+'px Quicksand,sans-serif';cx.fillText(r.l+1,(r.cx+.5)*S,(r.cy+.5)*S+1)});
+  }
+}
+function setZoom(){$('#cv').style.width=($('#wrap').clientWidth*$('#zoom').value)+'px'}
+$('#zoom').oninput=setZoom;window.addEventListener('resize',()=>{if(G)setZoom()});
+
+$('#cv').addEventListener('click',e=>{
+  if(!G||G.preview)return;const r=e.target.getBoundingClientRect();
+  const x=Math.floor((e.clientX-r.left)/r.width*G.W),y=Math.floor((e.clientY-r.top)/r.height*G.H);
+  if(x<0||y<0||x>=G.W||y>=G.H)return;
+  const id=G.rid[y*G.W+x],l=G.regs[id].l;if(G.filled[id])return;
+  if(l===G.sel){G.filled[id]=1;pal();draw();
+    if(G.filled.every(v=>v)){toast('Tamamlandı! Çok güzel oldu 🎉💞')}}
+  else toast('Bu bölge '+(l+1)+' numaralı 🎯');
+});
+$('#hint').onclick=e=>{G.hint=!G.hint;e.currentTarget.classList.toggle('on',G.hint);draw()};
+$('#prev').onclick=e=>{G.preview=!G.preview;e.currentTarget.classList.toggle('on',G.preview);draw()};
+$('#reset').onclick=()=>{if(confirm('Boyama sıfırlansın mı?')){G.filled.fill(0);pal();draw()}};
+$('#dl').onclick=()=>{$('#cv').toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='boyama.png';a.click()})};
+$('#k').oninput=e=>$('#kv').textContent=e.target.value;
+$('#pick').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  const ok=v=>{src=v;go()};
+  const fail=()=>toast('Resim açılamadı ('+(f.type||f.name.split('.').pop()||'bilinmeyen biçim')+'). JPG veya PNG dene.');
+  try{ok(await createImageBitmap(f));return}catch(x){}
+  const rd=new FileReader();rd.onerror=fail;
+  rd.onload=()=>{const i=new Image();i.onload=()=>ok(i);i.onerror=fail;i.src=rd.result};rd.readAsDataURL(f)};
+$('#demo').onclick=()=>{src=sample();go()};
+$('#regen').onclick=()=>src?go():toast('Önce bir resim seç');
+</script>
+</body>
+</html>
